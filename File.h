@@ -14,6 +14,9 @@ class File {
   uint32_t size;
   std::vector<Chunk> chunks;
 
+  File(std::string filename, uint32_t size);
+  File(std::string filename, uint32_t size, std::string address);
+
 };
 
 #endif //SHORRENT__FILE_H_
