@@ -48,7 +48,7 @@ struct TableStruct_gbuffer_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[5]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[6]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -65,6 +65,9 @@ extern FileDefaultTypeInternal _File_default_instance_;
 class FileList;
 class FileListDefaultTypeInternal;
 extern FileListDefaultTypeInternal _FileList_default_instance_;
+class Operation;
+class OperationDefaultTypeInternal;
+extern OperationDefaultTypeInternal _Operation_default_instance_;
 class RegChunk;
 class RegChunkDefaultTypeInternal;
 extern RegChunkDefaultTypeInternal _RegChunk_default_instance_;
@@ -76,6 +79,7 @@ PROTOBUF_NAMESPACE_OPEN
 template<> ::shorrent::Chunk* Arena::CreateMaybeMessage<::shorrent::Chunk>(Arena*);
 template<> ::shorrent::File* Arena::CreateMaybeMessage<::shorrent::File>(Arena*);
 template<> ::shorrent::FileList* Arena::CreateMaybeMessage<::shorrent::FileList>(Arena*);
+template<> ::shorrent::Operation* Arena::CreateMaybeMessage<::shorrent::Operation>(Arena*);
 template<> ::shorrent::RegChunk* Arena::CreateMaybeMessage<::shorrent::RegChunk>(Arena*);
 template<> ::shorrent::RegFile* Arena::CreateMaybeMessage<::shorrent::RegFile>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
@@ -105,6 +109,34 @@ inline bool Chunk_ChunkState_Parse(
     ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, Chunk_ChunkState* value) {
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<Chunk_ChunkState>(
     Chunk_ChunkState_descriptor(), name, value);
+}
+enum Operation_Type : int {
+  Operation_Type_regFile = 0,
+  Operation_Type_fileList = 1,
+  Operation_Type_getFileInfo = 2,
+  Operation_Type_regChunk = 3,
+  Operation_Type_ok = 4,
+  Operation_Type_Operation_Type_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
+  Operation_Type_Operation_Type_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
+};
+bool Operation_Type_IsValid(int value);
+constexpr Operation_Type Operation_Type_Type_MIN = Operation_Type_regFile;
+constexpr Operation_Type Operation_Type_Type_MAX = Operation_Type_ok;
+constexpr int Operation_Type_Type_ARRAYSIZE = Operation_Type_Type_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Operation_Type_descriptor();
+template<typename T>
+inline const std::string& Operation_Type_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, Operation_Type>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function Operation_Type_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    Operation_Type_descriptor(), enum_t_value);
+}
+inline bool Operation_Type_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, Operation_Type* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<Operation_Type>(
+    Operation_Type_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -1021,6 +1053,215 @@ class RegChunk PROTOBUF_FINAL :
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_gbuffer_2eproto;
 };
+// -------------------------------------------------------------------
+
+class Operation PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:shorrent.Operation) */ {
+ public:
+  inline Operation() : Operation(nullptr) {}
+  virtual ~Operation();
+
+  Operation(const Operation& from);
+  Operation(Operation&& from) noexcept
+    : Operation() {
+    *this = ::std::move(from);
+  }
+
+  inline Operation& operator=(const Operation& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Operation& operator=(Operation&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const Operation& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Operation* internal_default_instance() {
+    return reinterpret_cast<const Operation*>(
+               &_Operation_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  friend void swap(Operation& a, Operation& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Operation* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Operation* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Operation* New() const final {
+    return CreateMaybeMessage<Operation>(nullptr);
+  }
+
+  Operation* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<Operation>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const Operation& from);
+  void MergeFrom(const Operation& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Operation* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "shorrent.Operation";
+  }
+  protected:
+  explicit Operation(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_gbuffer_2eproto);
+    return ::descriptor_table_gbuffer_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  typedef Operation_Type Type;
+  static constexpr Type regFile =
+    Operation_Type_regFile;
+  static constexpr Type fileList =
+    Operation_Type_fileList;
+  static constexpr Type getFileInfo =
+    Operation_Type_getFileInfo;
+  static constexpr Type regChunk =
+    Operation_Type_regChunk;
+  static constexpr Type ok =
+    Operation_Type_ok;
+  static inline bool Type_IsValid(int value) {
+    return Operation_Type_IsValid(value);
+  }
+  static constexpr Type Type_MIN =
+    Operation_Type_Type_MIN;
+  static constexpr Type Type_MAX =
+    Operation_Type_Type_MAX;
+  static constexpr int Type_ARRAYSIZE =
+    Operation_Type_Type_ARRAYSIZE;
+  static inline const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor*
+  Type_descriptor() {
+    return Operation_Type_descriptor();
+  }
+  template<typename T>
+  static inline const std::string& Type_Name(T enum_t_value) {
+    static_assert(::std::is_same<T, Type>::value ||
+      ::std::is_integral<T>::value,
+      "Incorrect type passed to function Type_Name.");
+    return Operation_Type_Name(enum_t_value);
+  }
+  static inline bool Type_Parse(::PROTOBUF_NAMESPACE_ID::ConstStringParam name,
+      Type* value) {
+    return Operation_Type_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kDataFieldNumber = 2,
+    kMsgFieldNumber = 3,
+    kOpFieldNumber = 1,
+  };
+  // bytes data = 2;
+  void clear_data();
+  const std::string& data() const;
+  void set_data(const std::string& value);
+  void set_data(std::string&& value);
+  void set_data(const char* value);
+  void set_data(const void* value, size_t size);
+  std::string* mutable_data();
+  std::string* release_data();
+  void set_allocated_data(std::string* data);
+  private:
+  const std::string& _internal_data() const;
+  void _internal_set_data(const std::string& value);
+  std::string* _internal_mutable_data();
+  public:
+
+  // string msg = 3;
+  void clear_msg();
+  const std::string& msg() const;
+  void set_msg(const std::string& value);
+  void set_msg(std::string&& value);
+  void set_msg(const char* value);
+  void set_msg(const char* value, size_t size);
+  std::string* mutable_msg();
+  std::string* release_msg();
+  void set_allocated_msg(std::string* msg);
+  private:
+  const std::string& _internal_msg() const;
+  void _internal_set_msg(const std::string& value);
+  std::string* _internal_mutable_msg();
+  public:
+
+  // .shorrent.Operation.Type op = 1;
+  void clear_op();
+  ::shorrent::Operation_Type op() const;
+  void set_op(::shorrent::Operation_Type value);
+  private:
+  ::shorrent::Operation_Type _internal_op() const;
+  void _internal_set_op(::shorrent::Operation_Type value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:shorrent.Operation)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr data_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr msg_;
+  int op_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_gbuffer_2eproto;
+};
 // ===================================================================
 
 
@@ -1746,9 +1987,159 @@ inline void RegChunk::set_id(::PROTOBUF_NAMESPACE_ID::uint32 value) {
   // @@protoc_insertion_point(field_set:shorrent.RegChunk.id)
 }
 
+// -------------------------------------------------------------------
+
+// Operation
+
+// .shorrent.Operation.Type op = 1;
+inline void Operation::clear_op() {
+  op_ = 0;
+}
+inline ::shorrent::Operation_Type Operation::_internal_op() const {
+  return static_cast< ::shorrent::Operation_Type >(op_);
+}
+inline ::shorrent::Operation_Type Operation::op() const {
+  // @@protoc_insertion_point(field_get:shorrent.Operation.op)
+  return _internal_op();
+}
+inline void Operation::_internal_set_op(::shorrent::Operation_Type value) {
+  
+  op_ = value;
+}
+inline void Operation::set_op(::shorrent::Operation_Type value) {
+  _internal_set_op(value);
+  // @@protoc_insertion_point(field_set:shorrent.Operation.op)
+}
+
+// bytes data = 2;
+inline void Operation::clear_data() {
+  data_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline const std::string& Operation::data() const {
+  // @@protoc_insertion_point(field_get:shorrent.Operation.data)
+  return _internal_data();
+}
+inline void Operation::set_data(const std::string& value) {
+  _internal_set_data(value);
+  // @@protoc_insertion_point(field_set:shorrent.Operation.data)
+}
+inline std::string* Operation::mutable_data() {
+  // @@protoc_insertion_point(field_mutable:shorrent.Operation.data)
+  return _internal_mutable_data();
+}
+inline const std::string& Operation::_internal_data() const {
+  return data_.Get();
+}
+inline void Operation::_internal_set_data(const std::string& value) {
+  
+  data_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void Operation::set_data(std::string&& value) {
+  
+  data_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:shorrent.Operation.data)
+}
+inline void Operation::set_data(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  data_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:shorrent.Operation.data)
+}
+inline void Operation::set_data(const void* value,
+    size_t size) {
+  
+  data_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:shorrent.Operation.data)
+}
+inline std::string* Operation::_internal_mutable_data() {
+  
+  return data_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* Operation::release_data() {
+  // @@protoc_insertion_point(field_release:shorrent.Operation.data)
+  return data_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void Operation::set_allocated_data(std::string* data) {
+  if (data != nullptr) {
+    
+  } else {
+    
+  }
+  data_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), data,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:shorrent.Operation.data)
+}
+
+// string msg = 3;
+inline void Operation::clear_msg() {
+  msg_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline const std::string& Operation::msg() const {
+  // @@protoc_insertion_point(field_get:shorrent.Operation.msg)
+  return _internal_msg();
+}
+inline void Operation::set_msg(const std::string& value) {
+  _internal_set_msg(value);
+  // @@protoc_insertion_point(field_set:shorrent.Operation.msg)
+}
+inline std::string* Operation::mutable_msg() {
+  // @@protoc_insertion_point(field_mutable:shorrent.Operation.msg)
+  return _internal_mutable_msg();
+}
+inline const std::string& Operation::_internal_msg() const {
+  return msg_.Get();
+}
+inline void Operation::_internal_set_msg(const std::string& value) {
+  
+  msg_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void Operation::set_msg(std::string&& value) {
+  
+  msg_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:shorrent.Operation.msg)
+}
+inline void Operation::set_msg(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  msg_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:shorrent.Operation.msg)
+}
+inline void Operation::set_msg(const char* value,
+    size_t size) {
+  
+  msg_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:shorrent.Operation.msg)
+}
+inline std::string* Operation::_internal_mutable_msg() {
+  
+  return msg_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* Operation::release_msg() {
+  // @@protoc_insertion_point(field_release:shorrent.Operation.msg)
+  return msg_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void Operation::set_allocated_msg(std::string* msg) {
+  if (msg != nullptr) {
+    
+  } else {
+    
+  }
+  msg_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), msg,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:shorrent.Operation.msg)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
@@ -1768,6 +2159,11 @@ template <> struct is_proto_enum< ::shorrent::Chunk_ChunkState> : ::std::true_ty
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::shorrent::Chunk_ChunkState>() {
   return ::shorrent::Chunk_ChunkState_descriptor();
+}
+template <> struct is_proto_enum< ::shorrent::Operation_Type> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::shorrent::Operation_Type>() {
+  return ::shorrent::Operation_Type_descriptor();
 }
 
 PROTOBUF_NAMESPACE_CLOSE

@@ -39,7 +39,14 @@ message RegChunk {
 }
 
 message Operation {
-  string op = 1;
+  enum Type {
+    regFile = 0;
+    fileList = 1;
+    getFileInfo = 2;
+    regChunk = 3;
+    ok = 4;
+  };
+  Type op = 1;
   bytes data = 2;
   string msg = 3;
 }

@@ -37,6 +37,10 @@ class RegChunkDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<RegChunk> _instance;
 } _RegChunk_default_instance_;
+class OperationDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<Operation> _instance;
+} _Operation_default_instance_;
 }  // namespace shorrent
 static void InitDefaultsscc_info_Chunk_gbuffer_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -81,6 +85,20 @@ static void InitDefaultsscc_info_FileList_gbuffer_2eproto() {
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_FileList_gbuffer_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_FileList_gbuffer_2eproto}, {}};
 
+static void InitDefaultsscc_info_Operation_gbuffer_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::shorrent::_Operation_default_instance_;
+    new (ptr) ::shorrent::Operation();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::shorrent::Operation::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Operation_gbuffer_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Operation_gbuffer_2eproto}, {}};
+
 static void InitDefaultsscc_info_RegChunk_gbuffer_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -110,8 +128,8 @@ static void InitDefaultsscc_info_RegFile_gbuffer_2eproto() {
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_RegFile_gbuffer_2eproto}, {
       &scc_info_File_gbuffer_2eproto.base,}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_gbuffer_2eproto[5];
-static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_gbuffer_2eproto[1];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_gbuffer_2eproto[6];
+static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_gbuffer_2eproto[2];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_gbuffer_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_gbuffer_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -155,6 +173,14 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_gbuffer_2eproto::offsets[] PRO
   PROTOBUF_FIELD_OFFSET(::shorrent::RegChunk, address_),
   PROTOBUF_FIELD_OFFSET(::shorrent::RegChunk, filename_),
   PROTOBUF_FIELD_OFFSET(::shorrent::RegChunk, id_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::shorrent::Operation, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::shorrent::Operation, op_),
+  PROTOBUF_FIELD_OFFSET(::shorrent::Operation, data_),
+  PROTOBUF_FIELD_OFFSET(::shorrent::Operation, msg_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::shorrent::Chunk)},
@@ -162,6 +188,7 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 19, -1, sizeof(::shorrent::RegFile)},
   { 26, -1, sizeof(::shorrent::FileList)},
   { 32, -1, sizeof(::shorrent::RegChunk)},
+  { 40, -1, sizeof(::shorrent::Operation)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -170,6 +197,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::shorrent::_RegFile_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::shorrent::_FileList_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::shorrent::_RegChunk_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::shorrent::_Operation_default_instance_),
 };
 
 const char descriptor_table_protodef_gbuffer_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
@@ -183,23 +211,28 @@ const char descriptor_table_protodef_gbuffer_2eproto[] PROTOBUF_SECTION_VARIABLE
   "ddress\030\001 \001(\t\022\035\n\005files\030\002 \003(\0132\016.shorrent.F"
   "ile\"\031\n\010FileList\022\r\n\005files\030\001 \003(\t\"9\n\010RegChu"
   "nk\022\017\n\007address\030\001 \001(\t\022\020\n\010filename\030\002 \001(\t\022\n\n"
-  "\002id\030\003 \001(\rb\006proto3"
+  "\002id\030\003 \001(\r\"\226\001\n\tOperation\022$\n\002op\030\001 \001(\0162\030.sh"
+  "orrent.Operation.Type\022\014\n\004data\030\002 \001(\014\022\013\n\003m"
+  "sg\030\003 \001(\t\"H\n\004Type\022\013\n\007regFile\020\000\022\014\n\010fileLis"
+  "t\020\001\022\017\n\013getFileInfo\020\002\022\014\n\010regChunk\020\003\022\006\n\002ok"
+  "\020\004b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_gbuffer_2eproto_deps[1] = {
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_gbuffer_2eproto_sccs[5] = {
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_gbuffer_2eproto_sccs[6] = {
   &scc_info_Chunk_gbuffer_2eproto.base,
   &scc_info_File_gbuffer_2eproto.base,
   &scc_info_FileList_gbuffer_2eproto.base,
+  &scc_info_Operation_gbuffer_2eproto.base,
   &scc_info_RegChunk_gbuffer_2eproto.base,
   &scc_info_RegFile_gbuffer_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_gbuffer_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_gbuffer_2eproto = {
-  false, false, descriptor_table_protodef_gbuffer_2eproto, "gbuffer.proto", 417,
-  &descriptor_table_gbuffer_2eproto_once, descriptor_table_gbuffer_2eproto_sccs, descriptor_table_gbuffer_2eproto_deps, 5, 0,
+  false, false, descriptor_table_protodef_gbuffer_2eproto, "gbuffer.proto", 570,
+  &descriptor_table_gbuffer_2eproto_once, descriptor_table_gbuffer_2eproto_sccs, descriptor_table_gbuffer_2eproto_deps, 6, 0,
   schemas, file_default_instances, TableStruct_gbuffer_2eproto::offsets,
-  file_level_metadata_gbuffer_2eproto, 5, file_level_enum_descriptors_gbuffer_2eproto, file_level_service_descriptors_gbuffer_2eproto,
+  file_level_metadata_gbuffer_2eproto, 6, file_level_enum_descriptors_gbuffer_2eproto, file_level_service_descriptors_gbuffer_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -225,6 +258,33 @@ constexpr Chunk_ChunkState Chunk::done;
 constexpr Chunk_ChunkState Chunk::ChunkState_MIN;
 constexpr Chunk_ChunkState Chunk::ChunkState_MAX;
 constexpr int Chunk::ChunkState_ARRAYSIZE;
+#endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Operation_Type_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_gbuffer_2eproto);
+  return file_level_enum_descriptors_gbuffer_2eproto[1];
+}
+bool Operation_Type_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+      return true;
+    default:
+      return false;
+  }
+}
+
+#if (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
+constexpr Operation_Type Operation::regFile;
+constexpr Operation_Type Operation::fileList;
+constexpr Operation_Type Operation::getFileInfo;
+constexpr Operation_Type Operation::regChunk;
+constexpr Operation_Type Operation::ok;
+constexpr Operation_Type Operation::Type_MIN;
+constexpr Operation_Type Operation::Type_MAX;
+constexpr int Operation::Type_ARRAYSIZE;
 #endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
 
 // ===================================================================
@@ -1587,6 +1647,276 @@ void RegChunk::InternalSwap(RegChunk* other) {
 }
 
 
+// ===================================================================
+
+void Operation::InitAsDefaultInstance() {
+}
+class Operation::_Internal {
+ public:
+};
+
+Operation::Operation(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:shorrent.Operation)
+}
+Operation::Operation(const Operation& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  data_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_data().empty()) {
+    data_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_data(),
+      GetArena());
+  }
+  msg_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_msg().empty()) {
+    msg_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_msg(),
+      GetArena());
+  }
+  op_ = from.op_;
+  // @@protoc_insertion_point(copy_constructor:shorrent.Operation)
+}
+
+void Operation::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_Operation_gbuffer_2eproto.base);
+  data_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  msg_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  op_ = 0;
+}
+
+Operation::~Operation() {
+  // @@protoc_insertion_point(destructor:shorrent.Operation)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void Operation::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  data_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  msg_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+void Operation::ArenaDtor(void* object) {
+  Operation* _this = reinterpret_cast< Operation* >(object);
+  (void)_this;
+}
+void Operation::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void Operation::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const Operation& Operation::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_Operation_gbuffer_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void Operation::Clear() {
+// @@protoc_insertion_point(message_clear_start:shorrent.Operation)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  data_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  msg_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  op_ = 0;
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* Operation::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // .shorrent.Operation.Type op = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_set_op(static_cast<::shorrent::Operation_Type>(val));
+        } else goto handle_unusual;
+        continue;
+      // bytes data = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          auto str = _internal_mutable_data();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // string msg = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+          auto str = _internal_mutable_msg();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "shorrent.Operation.msg"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* Operation::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:shorrent.Operation)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .shorrent.Operation.Type op = 1;
+  if (this->op() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
+      1, this->_internal_op(), target);
+  }
+
+  // bytes data = 2;
+  if (this->data().size() > 0) {
+    target = stream->WriteBytesMaybeAliased(
+        2, this->_internal_data(), target);
+  }
+
+  // string msg = 3;
+  if (this->msg().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_msg().data(), static_cast<int>(this->_internal_msg().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "shorrent.Operation.msg");
+    target = stream->WriteStringMaybeAliased(
+        3, this->_internal_msg(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:shorrent.Operation)
+  return target;
+}
+
+size_t Operation::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:shorrent.Operation)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // bytes data = 2;
+  if (this->data().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_data());
+  }
+
+  // string msg = 3;
+  if (this->msg().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_msg());
+  }
+
+  // .shorrent.Operation.Type op = 1;
+  if (this->op() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_op());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void Operation::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:shorrent.Operation)
+  GOOGLE_DCHECK_NE(&from, this);
+  const Operation* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<Operation>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:shorrent.Operation)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:shorrent.Operation)
+    MergeFrom(*source);
+  }
+}
+
+void Operation::MergeFrom(const Operation& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:shorrent.Operation)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.data().size() > 0) {
+    _internal_set_data(from._internal_data());
+  }
+  if (from.msg().size() > 0) {
+    _internal_set_msg(from._internal_msg());
+  }
+  if (from.op() != 0) {
+    _internal_set_op(from._internal_op());
+  }
+}
+
+void Operation::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:shorrent.Operation)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Operation::CopyFrom(const Operation& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:shorrent.Operation)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Operation::IsInitialized() const {
+  return true;
+}
+
+void Operation::InternalSwap(Operation* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  data_.Swap(&other->data_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  msg_.Swap(&other->msg_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  swap(op_, other->op_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata Operation::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace shorrent
 PROTOBUF_NAMESPACE_OPEN
@@ -1604,6 +1934,9 @@ template<> PROTOBUF_NOINLINE ::shorrent::FileList* Arena::CreateMaybeMessage< ::
 }
 template<> PROTOBUF_NOINLINE ::shorrent::RegChunk* Arena::CreateMaybeMessage< ::shorrent::RegChunk >(Arena* arena) {
   return Arena::CreateMessageInternal< ::shorrent::RegChunk >(arena);
+}
+template<> PROTOBUF_NOINLINE ::shorrent::Operation* Arena::CreateMaybeMessage< ::shorrent::Operation >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::shorrent::Operation >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

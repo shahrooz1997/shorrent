@@ -6,17 +6,15 @@
 #define SHORRENT__SERVER_H_
 
 #include "FileHandler.h"
-#include <unistd.h>
-#include <cstdio>
-#include <sys/socket.h>
-#include <cstdlib>
-#include <netinet/in.h>
+#include <thread>
 
 class Server {
-  FileHandler fh;
+  static FileHandler fh;
+  static int sock;
 
-  static int message_handle();
   static int start();
+  static void message_handle(int sock);
+
 };
 
 #endif //SHORRENT__SERVER_H_
