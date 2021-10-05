@@ -73,8 +73,7 @@ int sendData(int sock, const void* data, size_t size){
 
 int sendData(int sock, const std::string& data){
   assert(!data.empty());
-  uint32_t size = data.size();
-  uint32_t size = htonl(size);
+  uint32_t size = htonl(static_cast<uint32_t>(data.size()));
   int result = sendData(sock, &size, sizeof(size));
   if(result == 0){
     result = sendData(sock, data.c_str(), data.size());

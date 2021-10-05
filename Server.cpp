@@ -5,10 +5,13 @@
 #include "Server.h"
 #include "gbuffer.pb.h"
 
+int Server::sock;
+FileHandler Server::fh;
+
 int Server::start() {
   struct sockaddr_in address;
-  int opt = 1;
-  int addrlen = sizeof(address);
+//  int opt = 1;
+//  int addrlen = sizeof(address);
 
   // Creating socket file descriptor
   if ((Server::sock = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
@@ -109,7 +112,7 @@ void Server::message_handle(int sock) {
         chunk_p->set_filename(ch.filename);
         chunk_p->set_path(ch.path);
         chunk_p->set_size(ch.size);
-        chunk_p->set_state(ch.state);
+        chunk_p->set_state(static_cast<shorrent::Chunk_ChunkState>(ch.state));
         for (auto p: ch.peers) {
           chunk_p->add_peers(p);
         }

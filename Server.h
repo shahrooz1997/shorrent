@@ -9,6 +9,7 @@
 #include <thread>
 
 class Server {
+ public:
   static FileHandler fh;
   static int sock;
 
