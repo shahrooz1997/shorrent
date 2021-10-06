@@ -9,13 +9,17 @@
 #include <vector>
 #include <mutex>
 #include <thread>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 class FileHandler {
  public:
   int registerFiles(const std::string& address, const std::vector<File>& files);
-  int fileList(std::vector<std::string>& files);
+  int fileList(std::vector<File>& files);
   int getFileInfo(const std::string& filename, File &file);
   int registerChunk(const std::string& address, const std::string& filename, uint32_t id);
+  int getChunk(const std::string& filename, uint32_t id, std::string& data);
 
  private:
   std::vector<File> files;

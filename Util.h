@@ -12,11 +12,14 @@
 #include <cstdlib>
 #include <netinet/in.h>
 #include <string>
+#include <arpa/inet.h>
 
 #define CHUNK_DEFAULT_SIZE_MB 1024
 #define SERVER_IP INADDR_ANY
 #define SERVER_PORT 8080
 #define BACKLOG_SIZE 1024
+#define FILES_PATH "files/"
+#define CHUNKS_PATH "chunks/"
 
 #define DPRINTF(flag, fmt, ...) \
     do{ \

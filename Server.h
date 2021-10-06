@@ -13,7 +13,7 @@ class Server {
   static FileHandler fh;
   static int sock;
 
-  static int start();
+  static void start();
   static void message_handle(int sock);
 
 };

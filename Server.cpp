@@ -8,7 +8,7 @@
 int Server::sock;
 FileHandler Server::fh;
 
-int Server::start() {
+void Server::start() {
   struct sockaddr_in address;
 //  int opt = 1;
 //  int addrlen = sizeof(address);
@@ -43,17 +43,18 @@ int Server::start() {
     exit(EXIT_FAILURE);
   }
 
+  DPRINTF(true, "Server is running on port %hu", SERVER_PORT);
+
   while(1){
     int new_sock = accept(Server::sock, NULL, NULL);
     if(new_sock < 0){
       DPRINTF(true, "Error: accept: %d, errno is %d\n", new_sock, errno);
     }
     else{
+      DPRINTF(true, "New connection created on fd %d\n", new_sock);
       std::thread ([new_sock](){ Server::message_handle(new_sock); }).detach();
     }
   }
-
-  return 0;
 }
 
 void Server::message_handle(int sock) {
@@ -85,11 +86,13 @@ void Server::message_handle(int sock) {
       break;
     }
     case shorrent::Operation_Type::Operation_Type_fileList: {
-      std::vector<std::string> files;
+      std::vector<File> files;
       Server::fh.fileList(files);
       shorrent::FileList fileList;
       for (auto f: files) {
-        fileList.add_files(f);
+        shorrent::File* file_p = fileList.add_files();
+        file_p->set_filename(f.filename);
+        file_p->set_size(f.size);
       }
       std::string tempStr;
       fileList.SerializeToString(&tempStr);

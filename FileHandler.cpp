@@ -12,10 +12,10 @@ int FileHandler::registerFiles(const std::string &address, const std::vector<Fil
   return 0;
 }
 
-int FileHandler::fileList(std::vector<std::string> &files) {
+int FileHandler::fileList(std::vector<File> &files) {
   std::lock_guard<std::mutex> lck(this->mtx);
   for (auto file: this->files) {
-    files.emplace_back(file.filename);
+    files.emplace_back(file.filename, file.size);
   }
   return 0;
 }
@@ -44,4 +44,17 @@ int FileHandler::registerChunk(const std::string &address, const std::string &fi
     }
   }
   return -1; // File not found.
+}
+
+int FileHandler::getChunk(const std::string &filename, uint32_t id, std::string &data) {
+  std::ifstream inFile;
+  inFile.open(filename + "!!!" + std::to_string(id));
+  if (!inFile.is_open()) {
+    return -1;
+  }
+  std::stringstream strStream;
+  strStream << inFile.rdbuf();
+  inFile.close();
+  data = strStream.str();
+  return 0;
 }

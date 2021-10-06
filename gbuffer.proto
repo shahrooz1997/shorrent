@@ -29,13 +29,17 @@ message RegFile {
 }
 
 message FileList {
-  repeated string files = 1;
+  repeated File files = 1;
 }
 
 message RegChunk {
   string address = 1;
   string filename = 2;
   uint32 id = 3;
+}
+
+message Data {
+  bytes data = 1;
 }
 
 message Operation {
@@ -45,6 +49,7 @@ message Operation {
     getFileInfo = 2;
     regChunk = 3;
     ok = 4;
+    getChunk = 5;
   };
   Type op = 1;
   bytes data = 2;
