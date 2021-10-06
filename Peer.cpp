@@ -61,7 +61,7 @@ void Peer::start() {
     exit(EXIT_FAILURE);
   }
 
-  DPRINTF(true, "Peer is running on port %hu", port);
+  DPRINTF(true, "Peer is running on port %hu\n", port);
 
   while(1){
     int new_sock = accept(this->sock, NULL, NULL);
@@ -116,12 +116,15 @@ int Peer::registerFile(const std::string& filename) {
     return -1;
   }
 
-  char buffer[CHUNK_DEFAULT_SIZE_MB * 1024 * 1024];
+  char buffer[CHUNK_DEFAULT_SIZE];
   uint32_t chunkCounter = 0;
-  while(inFile.read(buffer, CHUNK_DEFAULT_SIZE_MB * 1024 * 1024)) {
+  while(inFile.read(buffer, CHUNK_DEFAULT_SIZE)) {
     std::string chunkFilename = filename + "!!!" + std::to_string(chunkCounter);
     std::ofstream outFile(std::string(CHUNKS_PATH) + chunkFilename);
-    outFile.write(buffer, CHUNK_DEFAULT_SIZE_MB * 1024 * 1024);
+    if (!outFile.is_open()) {
+      return -1;
+    }
+    outFile.write(buffer, CHUNK_DEFAULT_SIZE);
     chunkCounter++;
     outFile.close();
   }
@@ -131,7 +134,7 @@ int Peer::registerFile(const std::string& filename) {
   outFile.write(buffer, lastReadSize);
   outFile.close();
   inFile.close();
-  uint32_t fileSize = chunkCounter * (CHUNK_DEFAULT_SIZE_MB * 1024 * 1024) + static_cast<uint32_t>(lastReadSize);
+  uint32_t fileSize = chunkCounter * (CHUNK_DEFAULT_SIZE) + static_cast<uint32_t>(lastReadSize);
 
   // Send regFile operation to the server
   int sock = this->connectToServer();
@@ -206,13 +209,13 @@ int Peer::downloadFile(File &file) {
 
   // Combine chunks together.
   std::ofstream outFile(std::string(FILES_PATH) + file.filename);
-  char buffer[CHUNK_DEFAULT_SIZE_MB * 1024 * 1024];
+  char buffer[CHUNK_DEFAULT_SIZE];
   uint32_t chunkCounter = 0;
   uint32_t readSize = 0;
   while(readSize < file.size) {
     std::string chunkFilename = file.filename + "!!!" + std::to_string(chunkCounter);
     std::ifstream inFile(std::string(CHUNKS_PATH) + chunkFilename);
-    inFile.read(buffer, CHUNK_DEFAULT_SIZE_MB * 1024 * 1024);
+    inFile.read(buffer, CHUNK_DEFAULT_SIZE);
     outFile.write(buffer, inFile.gcount());
     readSize += static_cast<uint32_t>(inFile.gcount());
     inFile.close();

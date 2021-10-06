@@ -6,15 +6,28 @@
 
 int FileHandler::registerFiles(const std::string &address, const std::vector<File> &files) {
   std::lock_guard<std::mutex> lck(this->mtx);
-  for (auto file: files) {
-    this->files.emplace_back(file.filename, file.size, address);
+  bool existed;
+  for (auto& file: files) {
+    existed = false;
+    for (auto& f: this->files) {
+      if (f.filename == file.filename) {
+        for (auto& chunk: f.chunks) {
+          chunk.add_peer(address);
+        }
+        existed = true;
+        break;
+      }
+    }
+    if (!existed) {
+      this->files.emplace_back(file.filename, file.size, address);
+    }
   }
   return 0;
 }
 
 int FileHandler::fileList(std::vector<File> &files) {
   std::lock_guard<std::mutex> lck(this->mtx);
-  for (auto file: this->files) {
+  for (auto& file: this->files) {
     files.emplace_back(file.filename, file.size);
   }
   return 0;
@@ -22,7 +35,7 @@ int FileHandler::fileList(std::vector<File> &files) {
 
 int FileHandler::getFileInfo(const std::string &filename, File &file) {
   std::lock_guard<std::mutex> lck(this->mtx);
-  for (auto f: this->files) {
+  for (auto& f: this->files) {
     if (f.filename == filename) {
       file = f;
       return 0;
@@ -33,9 +46,9 @@ int FileHandler::getFileInfo(const std::string &filename, File &file) {
 
 int FileHandler::registerChunk(const std::string &address, const std::string &filename, uint32_t id) {
   std::lock_guard<std::mutex> lck(this->mtx);
-  for (auto f: this->files) {
+  for (auto& f: this->files) {
     if (f.filename == filename) {
-      for (auto chunk: f.chunks) {
+      for (auto& chunk: f.chunks) {
         if (chunk.id == id) {
           chunk.add_peer(address);
         }

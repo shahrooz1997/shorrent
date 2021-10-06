@@ -14,7 +14,7 @@
 #include <string>
 #include <arpa/inet.h>
 
-#define CHUNK_DEFAULT_SIZE_MB 1024
+#define CHUNK_DEFAULT_SIZE (1024 * 1024)
 #define SERVER_IP INADDR_ANY
 #define SERVER_PORT 8080
 #define BACKLOG_SIZE 1024

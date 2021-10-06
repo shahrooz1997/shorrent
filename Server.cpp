@@ -44,7 +44,7 @@ void Server::start() {
     exit(EXIT_FAILURE);
   }
 
-  DPRINTF(true, "Server is running on port %hu", SERVER_PORT);
+  DPRINTF(true, "Server is running on port %hu\n", SERVER_PORT);
 
   while(1){
     int new_sock = accept(Server::sock, NULL, NULL);
