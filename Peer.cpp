@@ -4,6 +4,8 @@
 
 #include "Peer.h"
 #include "gbuffer.pb.h"
+#include <thread>
+#include <future>
 
 FileHandler Peer::fh;
 
@@ -166,8 +168,44 @@ int Peer::fileList(std::vector<File>& files) {
   return 0;
 }
 
-int Peer::downloadFile(File &file) {
+int Peer::downloadChunk(const std::string address, const std::string filename, uint32_t id) {
+  int ret = this->getChunk(address, filename, id);
+  if (ret != 0) {
+    return ret;
+  }
+  ret = this->registerChunk(filename, id);
+  return ret;
+}
 
+int Peer::downloadFile(File &file) {
+  // Download chunks.
+  std::vector<std::future<int>> threads;
+  for (auto& chunk: file.chunks) {
+    // Todo: Pick the right peer to download the chunk from.
+    threads.emplace_back(std::async(std::launch::async, &Peer::downloadChunk, this, chunk.peers[0],
+                                    chunk.filename, chunk.id));
+  }
+  for (auto& t: threads) {
+    if (t.get() != 0) {
+      DPRINTF(true, "Chunk download error");
+    }
+  }
+
+  // Combine chunks together.
+  std::ofstream outFile(std::string(FILES_PATH) + file.filename);
+  char buffer[CHUNK_DEFAULT_SIZE_MB * 1024 * 1024];
+  uint32_t chunkCounter = 0;
+  uint32_t readSize = 0;
+  while(readSize < file.size) {
+    std::string chunkFilename = file.filename + "!!!" + std::to_string(chunkCounter);
+    std::ifstream inFile(std::string(CHUNKS_PATH) + chunkFilename);
+    inFile.read(buffer, CHUNK_DEFAULT_SIZE_MB * 1024 * 1024);
+    outFile.write(buffer, inFile.gcount());
+    readSize += inFile.gcount();
+    inFile.close();
+    chunkCounter++;
+  }
+  outFile.close();
   return 0;
 }
 
@@ -221,7 +259,7 @@ int Peer::registerChunk(const std::string &filename, uint32_t id) {
   return 0;
 }
 
-int Peer::getChunk(const std::string &filename, uint32_t id) {
+int Peer::getChunk(const std::string& address, const std::string &filename, uint32_t id) {
   shorrent::RegChunk regChunk;
   regChunk.set_filename(filename);
   regChunk.set_id(id);

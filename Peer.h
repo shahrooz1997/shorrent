@@ -27,7 +27,8 @@ class Peer {
  private:
   int getFileInfo(const std::string &filename, File &fileInfo);
   int registerChunk(const std::string& filename, uint32_t id);
-  int getChunk(const std::string& filename, uint32_t id);
+  int getChunk(const std::string& address, const std::string& filename, uint32_t id);
+  int downloadChunk(const std::string address, const std::string filename, uint32_t id);
 };
 
 #endif //SHORRENT__PEER_H_
