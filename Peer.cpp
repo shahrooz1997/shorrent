@@ -40,8 +40,13 @@ void Peer::start() {
   }
 
   address.sin_family = AF_INET;
-  inet_pton(AF_INET, this->address.substr(0, this->address.find(':')).c_str(), &(address.sin_addr));
   address.sin_port = htons(port);
+
+  if(inet_pton(AF_INET, this->address.substr(0, this->address.find(':')).c_str(), &(address.sin_addr))<=0)
+  {
+    printf("\nInvalid address/ Address not supported \n");
+    exit(EXIT_FAILURE);
+  }
 
   // Forcefully attaching socket to the port 8080
   if (bind(this->sock, (struct sockaddr *)&address,
@@ -129,6 +134,10 @@ int Peer::registerFile(const std::string& filename) {
   uint32_t fileSize = chunkCounter * (CHUNK_DEFAULT_SIZE_MB * 1024 * 1024) + static_cast<uint32_t>(lastReadSize);
 
   // Send regFile operation to the server
+  int sock = this->connectToServer();
+  if (sock < 0) {
+    return -1;
+  }
   shorrent::RegFile regFile;
   regFile.set_address(this->address);
   shorrent::File* file_p = regFile.add_files();
@@ -143,8 +152,8 @@ int Peer::registerFile(const std::string& filename) {
 
   std::string tempStr;
   operation.SerializeToString(&tempStr);
-  sendData(this->sock, tempStr);
-  recvData(this->sock, tempStr);
+  sendData(sock, tempStr);
+  recvData(sock, tempStr);
   shorrent::Operation operation2;
   operation2.ParseFromString(tempStr);
   if (operation2.op() != shorrent::Operation_Type::Operation_Type_ok) {
@@ -154,12 +163,16 @@ int Peer::registerFile(const std::string& filename) {
 }
 
 int Peer::fileList(std::vector<File>& files) {
+  int sock = this->connectToServer();
+  if (sock < 0) {
+    return -1;
+  }
   shorrent::Operation operation;
   operation.set_op(shorrent::Operation_Type::Operation_Type_fileList);
   std::string tempStr;
   operation.SerializeToString(&tempStr);
-  sendData(this->sock, tempStr);
-  recvData(this->sock, tempStr);
+  sendData(sock, tempStr);
+  recvData(sock, tempStr);
   shorrent::FileList fileList;
   fileList.ParseFromString(tempStr);
   for (int i = 0; i < fileList.files_size(); i++) {
@@ -201,7 +214,7 @@ int Peer::downloadFile(File &file) {
     std::ifstream inFile(std::string(CHUNKS_PATH) + chunkFilename);
     inFile.read(buffer, CHUNK_DEFAULT_SIZE_MB * 1024 * 1024);
     outFile.write(buffer, inFile.gcount());
-    readSize += inFile.gcount();
+    readSize += static_cast<uint32_t>(inFile.gcount());
     inFile.close();
     chunkCounter++;
   }
@@ -210,6 +223,10 @@ int Peer::downloadFile(File &file) {
 }
 
 int Peer::getFileInfo(const std::string &filename, File &fileInfo) {
+  int sock = this->connectToServer();
+  if (sock < 0) {
+    return -1;
+  }
   shorrent::File file;
   file.set_filename(filename);
   std::string dataTmp;
@@ -220,8 +237,8 @@ int Peer::getFileInfo(const std::string &filename, File &fileInfo) {
   operation.set_data(dataTmp);
   std::string tempStr;
   operation.SerializeToString(&tempStr);
-  sendData(this->sock, tempStr);
-  recvData(this->sock, tempStr);
+  sendData(sock, tempStr);
+  recvData(sock, tempStr);
   shorrent::File replyFile;
   replyFile.ParseFromString(tempStr);
   fileInfo.filename = replyFile.filename();
@@ -237,6 +254,10 @@ int Peer::getFileInfo(const std::string &filename, File &fileInfo) {
 }
 
 int Peer::registerChunk(const std::string &filename, uint32_t id) {
+  int sock = this->connectToServer();
+  if (sock < 0) {
+    return -1;
+  }
   shorrent::RegChunk regChunk;
   regChunk.set_filename(filename);
   regChunk.set_id(id);
@@ -249,8 +270,8 @@ int Peer::registerChunk(const std::string &filename, uint32_t id) {
   operation.set_data(dataTmp);
   std::string tempStr;
   operation.SerializeToString(&tempStr);
-  sendData(this->sock, tempStr);
-  recvData(this->sock, tempStr);
+  sendData(sock, tempStr);
+  recvData(sock, tempStr);
   shorrent::Operation operation2;
   operation2.ParseFromString(tempStr);
   if (operation2.op() != shorrent::Operation_Type::Operation_Type_ok) {
@@ -260,6 +281,10 @@ int Peer::registerChunk(const std::string &filename, uint32_t id) {
 }
 
 int Peer::getChunk(const std::string& address, const std::string &filename, uint32_t id) {
+  int sock = this->connectTo(address);
+  if (sock < 0) {
+    return -1;
+  }
   shorrent::RegChunk regChunk;
   regChunk.set_filename(filename);
   regChunk.set_id(id);
@@ -271,8 +296,8 @@ int Peer::getChunk(const std::string& address, const std::string &filename, uint
   operation.set_data(dataTmp);
   std::string tempStr;
   operation.SerializeToString(&tempStr);
-  sendData(this->sock, tempStr);
-  recvData(this->sock, tempStr);
+  sendData(sock, tempStr);
+  recvData(sock, tempStr);
   shorrent::Data data;
   data.ParseFromString(tempStr);
 
@@ -281,4 +306,52 @@ int Peer::getChunk(const std::string& address, const std::string &filename, uint
   outFile.write(data.data().c_str(), static_cast<std::streamsize>(data.data().size()));
   outFile.close();
   return 0;
+}
+
+int Peer::connectToServer() {
+  struct sockaddr_in serv_addr;
+  serv_addr.sin_addr.s_addr = SERVER_IP;
+
+  std::string address(inet_ntoa(serv_addr.sin_addr));
+  address += ":";
+  address += std::to_string(SERVER_PORT);
+
+  return this->connectTo(address);
+}
+
+int Peer::connectTo(const std::string &address) {
+  int sock = 0;
+  struct sockaddr_in serv_addr;
+
+  if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+  {
+    printf("\n Socket creation error \n");
+    return -1;
+  }
+
+  int portInt = std::stoi(address.substr(address.find(':') + 1));
+  uint16_t port = 0;
+  if (portInt <= static_cast<int>(UINT16_MAX) && portInt >=0) {
+    port = static_cast<uint16_t>(portInt);
+  } else {
+    perror("Bad port number");
+    exit(EXIT_FAILURE);
+  }
+
+  serv_addr.sin_family = AF_INET;
+  serv_addr.sin_port = htons(port);
+
+  if(inet_pton(AF_INET, address.substr(0, address.find(':')).c_str(), &(serv_addr.sin_addr))<=0)
+  {
+    printf("\nInvalid address/ Address not supported \n");
+    return -1;
+  }
+
+  if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+  {
+    printf("\nConnection Failed \n");
+    return -1;
+  }
+
+  return sock;
 }

@@ -28,9 +28,10 @@ void Server::start() {
 //  }
 
   address.sin_family = AF_INET;
-  address.sin_addr.s_addr = SERVER_IP;
   address.sin_port = htons(SERVER_PORT);
-  // Forcefully attaching socket to the port 8080
+  address.sin_addr.s_addr = SERVER_IP;
+
+  // Forcefully attaching socket to the port
   if (bind(Server::sock, (struct sockaddr *)&address,
            sizeof(address)) < 0) {
     perror("bind failed");
