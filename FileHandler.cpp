@@ -61,7 +61,7 @@ int FileHandler::registerChunk(const std::string &address, const std::string &fi
 
 int FileHandler::getChunk(const std::string &filename, uint32_t id, std::string &data) {
   std::ifstream inFile;
-  inFile.open(filename + "!!!" + std::to_string(id));
+  inFile.open(std::string(CHUNKS_PATH) + filename + "!!!" + std::to_string(id));
   if (!inFile.is_open()) {
     return -1;
   }
