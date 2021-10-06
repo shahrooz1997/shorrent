@@ -6,19 +6,22 @@
 #include <iostream>
 
 int main(int argc, char* argv[]) {
-//  if (argc < 2) {
-//    return -1;
-//  }
-  std::string address(argv[1]); // IP:Port
+  if (argc < 2) {
+    std::cout << "Usage: " << argv[0] << " [IP:Port]" << std::endl;
+    return -1;
+  }
+//  std::string address(argv[1]); // IP:Port
 //  std::string address("127.0.0.1:8081"); // IP:Port
-  Peer peer(address);
+  Peer peer(argv[1]);
   // Start the peer server.
   std::thread(&Peer::start, peer).detach();
   while(true) {
+    std::cout << "Enter your command: " << std::endl;
     std::string command("fileList");
     std::cin >> command;
     if (command == "regFile") {
       std::string filename("sample");
+      std::cout << "Enter the filename: " << std::endl;
       std::cin >> filename;
       if (peer.registerFile(filename) != 0) {
         DPRINTF(true, "Error running registerFile\n");
@@ -36,6 +39,7 @@ int main(int argc, char* argv[]) {
       }
     } else if (command == "download") {
       std::string filename;
+      std::cout << "Enter the filename: " << std::endl;
       std::cin >> filename;
       File fileInfo;
       if (peer.getFileInfo(filename, fileInfo) != 0) {

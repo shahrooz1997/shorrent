@@ -15,6 +15,7 @@
 
 class FileHandler {
  public:
+  FileHandler();
   int registerFiles(const std::string& address, const std::vector<File>& files);
   int fileList(std::vector<File>& files);
   int getFileInfo(const std::string& filename, File &file);
@@ -24,7 +25,8 @@ class FileHandler {
  private:
   std::vector<File> files;
   std::mutex mtx;
-
+  int readStateFromFile();
+  int saveStateToFile();
 };
 
 #endif //SHORRENT__FILEHANDLER_H_
