@@ -7,6 +7,8 @@
 #include <thread>
 #include <future>
 #include <chrono>
+#include <algorithm>
+#include <random>
 
 FileHandler Peer::fh(true);
 
@@ -107,6 +109,7 @@ void Peer::message_handle(int sock) {
       DPRINTF(true, "Operation not found: %d\n", operation.op());
     }
   }
+  close(sock);
 }
 
 int Peer::registerFile(const std::string& filename) {
@@ -158,6 +161,7 @@ int Peer::registerFile(const std::string& filename) {
   operation.SerializeToString(&tempStr);
   sendData(sock, tempStr);
   recvData(sock, tempStr);
+  close(sock);
   shorrent::Operation operation2;
   operation2.ParseFromString(tempStr);
   if (operation2.op() != shorrent::Operation_Type::Operation_Type_ok) {
@@ -177,6 +181,7 @@ int Peer::fileList(std::vector<File>& files) {
   operation.SerializeToString(&tempStr);
   sendData(sock, tempStr);
   recvData(sock, tempStr);
+  close(sock);
   shorrent::FileList fileList;
   fileList.ParseFromString(tempStr);
   for (int i = 0; i < fileList.files_size(); i++) {
@@ -186,6 +191,11 @@ int Peer::fileList(std::vector<File>& files) {
 }
 
 int Peer::downloadChunk(const std::string address, const std::string filename, uint32_t id) {
+  // Check if the peer has already the chunk.
+  if (fileExist(std::string(CHUNKS_PATH) + filename + "!!!" + std::to_string(id))) {
+    return 0;
+  }
+
   int ret = this->getChunk(address, filename, id);
   if (ret != 0) {
     return ret;
@@ -212,7 +222,6 @@ int Peer::downloadFile(File &file) {
   std::vector<std::future<int>> threads;
   int numDownloadedChunks = 0;
   for (auto& chunk: file.chunks) {
-    // Todo: Pick the right peer to download the chunk from.
     threads.emplace_back(std::async(std::launch::async, &Peer::downloadChunk, this, chunk.peers[0],
                                     chunk.filename, chunk.id));
     if (threads.size() >= MAX_NUM_OF_THREADS) {
@@ -277,6 +286,7 @@ int Peer::getFileInfo(const std::string &filename, File &fileInfo) {
   operation.SerializeToString(&tempStr);
   sendData(sock, tempStr);
   recvData(sock, tempStr);
+  close(sock);
   shorrent::File replyFile;
   replyFile.ParseFromString(tempStr);
   fileInfo.filename = replyFile.filename();
@@ -288,11 +298,15 @@ int Peer::getFileInfo(const std::string &filename, File &fileInfo) {
       fileInfo.chunks.back().add_peer(replyFile.chunks(i).peers(j));
     }
   }
-
   // Put the rarest chunks to the top.
   std::sort(fileInfo.chunks.begin(), fileInfo.chunks.end(),
             [](Chunk& ch1, Chunk& ch2){ return ch1.peers.size() < ch2.peers.size(); });
-
+  // Shuffle available peers.
+  DPRINTF(true, "AAA %lu\n", fileInfo.chunks[0].peers.size());
+  std::srand(static_cast<unsigned int>((std::time(nullptr))));
+  for (auto& ch: fileInfo.chunks) {
+    random_shuffle(ch.peers.begin(), ch.peers.end());
+  }
   return 0;
 }
 
@@ -315,6 +329,7 @@ int Peer::registerChunk(const std::string &filename, uint32_t id) {
   operation.SerializeToString(&tempStr);
   sendData(sock, tempStr);
   recvData(sock, tempStr);
+  close(sock);
   shorrent::Operation operation2;
   operation2.ParseFromString(tempStr);
   if (operation2.op() != shorrent::Operation_Type::Operation_Type_ok) {
@@ -341,6 +356,7 @@ int Peer::getChunk(const std::string& address, const std::string &filename, uint
   operation.SerializeToString(&tempStr);
   sendData(sock, tempStr);
   recvData(sock, tempStr);
+  close(sock);
   shorrent::Data data;
   data.ParseFromString(tempStr);
 

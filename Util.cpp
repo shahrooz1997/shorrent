@@ -88,6 +88,25 @@ void listDir(const std::string& path, std::vector<std::string>& files) {
   }
   while ((entry = readdir(dir)) != NULL) {
     files.push_back(entry->d_name);
+    if (files.back() == "." || files.back() == ".." || files.back().find("!!!") == std::string::npos) {
+      files.pop_back();
+    }
+  }
+  closedir(dir);
+}
+
+void listDir2(const std::string& path, std::vector<std::string>& files) {
+  struct dirent *entry;
+  DIR *dir = opendir(path.c_str());
+
+  if (dir == NULL) {
+    return;
+  }
+  while ((entry = readdir(dir)) != NULL) {
+    files.push_back(entry->d_name);
+    if (files.back() == "." || files.back() == ".." || files.back() == ".gitignore") {
+      files.pop_back();
+    }
   }
   closedir(dir);
 }
@@ -99,4 +118,7 @@ uint32_t fileSize(const std::string &path) {
   uint32_t ret = static_cast<uint32_t>(ftell(pFile));
   fclose ( pFile );
   return ret;
+}
+bool fileExist(const std::string &path) {
+  return access(path.c_str(), F_OK) == 0;
 }

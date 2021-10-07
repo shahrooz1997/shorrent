@@ -35,7 +35,10 @@
 int recvData(int sock, std::string& data);
 int sendData(int sock, const std::string& data);
 
+// File operations.
 void listDir(const std::string& path, std::vector<std::string>& files);
+void listDir2(const std::string& path, std::vector<std::string>& files);
 uint32_t fileSize(const std::string& path);
+bool fileExist(const std::string& path);
 
 #endif //SHORRENT__UTIL_H_

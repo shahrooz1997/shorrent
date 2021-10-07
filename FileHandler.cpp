@@ -31,7 +31,9 @@ int FileHandler::registerFiles(const std::string &address, const std::vector<Fil
     for (auto& f: this->files) {
       if (f.filename == file.filename) {
         for (auto& chunk: f.chunks) {
-          chunk.add_peer(address);
+          if (std::find(chunk.peers.begin(), chunk.peers.end(), address) == chunk.peers.end()) {
+            chunk.add_peer(address);
+          }
         }
         existed = true;
         break;
@@ -70,8 +72,10 @@ int FileHandler::registerChunk(const std::string &address, const std::string &fi
     if (f.filename == filename) {
       for (auto& chunk: f.chunks) {
         if (chunk.id == id) {
-          chunk.add_peer(address);
-          this->saveStateToFile();
+          if (std::find(chunk.peers.begin(), chunk.peers.end(), address) == chunk.peers.end()) {
+            chunk.add_peer(address);
+            this->saveStateToFile();
+          }
           return 0;
         }
       }

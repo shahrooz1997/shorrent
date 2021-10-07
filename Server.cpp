@@ -76,7 +76,9 @@ void Server::message_handle(int sock) {
       for (int i = 0; i < regFile.files_size(); i++) {
         files.emplace_back(regFile.files(i).filename(), regFile.files(i).size());
       }
-      Server::fh.registerFiles(regFile.address(), files);
+      if (Server::fh.registerFiles(regFile.address(), files) != 0) {
+        DPRINTF(true, "Server::fh.registerFiles error");
+      }
 
       // Send back success.
       shorrent::Operation replyOperation;
@@ -88,7 +90,9 @@ void Server::message_handle(int sock) {
     }
     case shorrent::Operation_Type::Operation_Type_fileList: {
       std::vector<File> files;
-      Server::fh.fileList(files);
+      if (Server::fh.fileList(files) != 0) {
+        DPRINTF(true, "Server::fh.fileList error");
+      }
       shorrent::FileList fileList;
       for (auto f: files) {
         shorrent::File* file_p = fileList.add_files();
@@ -104,7 +108,9 @@ void Server::message_handle(int sock) {
       shorrent::File file;
       file.ParseFromString(operation.data());
       File fileInfo;
-      Server::fh.getFileInfo(file.filename(), fileInfo);
+      if (Server::fh.getFileInfo(file.filename(), fileInfo) != 0) {
+        DPRINTF(true, "Server::fh.getFileInfo error");
+      }
 
       // Send back data.
       shorrent::File replyFile;
@@ -129,7 +135,9 @@ void Server::message_handle(int sock) {
     case shorrent::Operation_Type::Operation_Type_regChunk: {
       shorrent::RegChunk regChunk;
       regChunk.ParseFromString(operation.data());
-      Server::fh.registerChunk(regChunk.address(), regChunk.filename(), regChunk.id());
+      if (Server::fh.registerChunk(regChunk.address(), regChunk.filename(), regChunk.id()) != 0) {
+        DPRINTF(true, "Server::fh.registerChunk");
+      }
 
       // Send back success.
       shorrent::Operation replyOperation;

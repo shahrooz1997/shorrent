@@ -13,23 +13,31 @@ cd test
 mkdir peer1
 cd peer1
 ln -s "${app_path}/Peer" ./Peer
+cp -r "${app_path}/../files" ./
+mkdir chunks
+# cp -r "${app_path}/../chunks" ./
+gnome-terminal
 cd ..
+
 mkdir peer2
 cd peer2
 ln -s "${app_path}/Peer" ./Peer
-cd ..
-
-cp -r "${app_path}/../files" ./peer1/
-cp -r "${app_path}/../files" ./peer2/
-cp -r "${app_path}/../chunks" ./peer1/
-cp -r "${app_path}/../chunks" ./peer2/
-
-cp "${app_path}/Server" ./
-cd test
-cd peer1
-gnome-terminal
-cd ../peer2
-rm -rf files/* chunks/*
+mkdir files
+mkdir chunks
+# cp -r "${app_path}/../files" ./
+# cp -r "${app_path}/../chunks" ./
 gnome-terminal
 cd ..
+
+mkdir peer3
+cd peer3
+ln -s "${app_path}/Peer" ./Peer
+mkdir files
+mkdir chunks
+# cp -r "${app_path}/../files" ./
+# cp -r "${app_path}/../chunks" ./
+gnome-terminal
+cd ..
+
+cp "${app_path}/Server" ./Server
 ./Server
