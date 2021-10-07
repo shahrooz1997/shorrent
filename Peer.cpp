@@ -8,7 +8,7 @@
 #include <future>
 #include <chrono>
 
-FileHandler Peer::fh;
+FileHandler Peer::fh(true);
 
 Peer::Peer(const std::string &address) : address(address) {}
 
@@ -194,9 +194,23 @@ int Peer::downloadChunk(const std::string address, const std::string filename, u
   return ret;
 }
 
+void showProgressBar(float progress) {
+  int barWidth = 70;
+  std::cout << "[";
+  int pos = static_cast<int>(static_cast<float>(barWidth) * progress);
+  for (int i = 0; i < barWidth; ++i) {
+    if (i < pos) std::cout << "=";
+    else if (i == pos) std::cout << ">";
+    else std::cout << " ";
+  }
+  std::cout << "] " << int(progress * 100.0) << " %\r";
+  std::cout.flush();
+}
+
 int Peer::downloadFile(File &file) {
   // Download chunks.
   std::vector<std::future<int>> threads;
+  int numDownloadedChunks = 0;
   for (auto& chunk: file.chunks) {
     // Todo: Pick the right peer to download the chunk from.
     threads.emplace_back(std::async(std::launch::async, &Peer::downloadChunk, this, chunk.peers[0],
@@ -211,6 +225,8 @@ int Peer::downloadFile(File &file) {
             }
             threads.erase(threads.begin() + i);
             i--;
+            numDownloadedChunks++;
+            showProgressBar(static_cast<float>(numDownloadedChunks) / static_cast<float>(file.chunks.size()));
             block = false;
           }
         }
@@ -221,7 +237,10 @@ int Peer::downloadFile(File &file) {
     if (t.get() != 0) {
       DPRINTF(true, "Chunk download error");
     }
+    numDownloadedChunks++;
+    showProgressBar(static_cast<float>(numDownloadedChunks) / static_cast<float>(file.chunks.size()));
   }
+  std::cout << std::endl;
 
   // Combine chunks together.
   std::ofstream outFile(std::string(FILES_PATH) + file.filename);
@@ -269,6 +288,11 @@ int Peer::getFileInfo(const std::string &filename, File &fileInfo) {
       fileInfo.chunks.back().add_peer(replyFile.chunks(i).peers(j));
     }
   }
+
+  // Put the rarest chunks to the top.
+  std::sort(fileInfo.chunks.begin(), fileInfo.chunks.end(),
+            [](Chunk& ch1, Chunk& ch2){ return ch1.peers.size() < ch2.peers.size(); });
+
   return 0;
 }
 

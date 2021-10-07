@@ -4,6 +4,7 @@
 
 #include "Peer.h"
 #include <iostream>
+#include <chrono>
 
 int main(int argc, char* argv[]) {
   if (argc < 2) {
@@ -15,13 +16,14 @@ int main(int argc, char* argv[]) {
   Peer peer(argv[1]);
   // Start the peer server.
   std::thread(&Peer::start, peer).detach();
+  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   while(true) {
-    std::cout << "Enter your command: " << std::endl;
+    std::cout << "Enter your command: ";
     std::string command("fileList");
     std::cin >> command;
     if (command == "regFile") {
       std::string filename("sample");
-      std::cout << "Enter the filename: " << std::endl;
+      std::cout << "Enter the filename: ";
       std::cin >> filename;
       if (peer.registerFile(filename) != 0) {
         std::cout << "Error running registerFile" << std::endl;
@@ -30,16 +32,18 @@ int main(int argc, char* argv[]) {
       std::vector<File> files;
       if (peer.fileList(files) != 0) {
         std::cout << "Error running fileList" << std::endl;
-      }
-      std::cout << "Files:" << std::endl;
-      int counter = 0;
-      for (auto& f: files) {
-        counter++;
-        std::cout << counter << ": " << f.filename << std::endl;
+      } else {
+        std::cout << "Files:" << std::endl;
+        int counter = 0;
+        for (auto &f: files) {
+          counter++;
+          std::cout << counter << ": " << f.filename << "\t\t" << static_cast<double>(f.size) / 1024. << "KB"
+                    << std::endl;
+        }
       }
     } else if (command == "download") {
       std::string filename;
-      std::cout << "Enter the filename: " << std::endl;
+      std::cout << "Enter the filename: ";
       std::cin >> filename;
       File fileInfo;
       if (peer.getFileInfo(filename, fileInfo) != 0) {
@@ -51,9 +55,9 @@ int main(int argc, char* argv[]) {
     } else if (command == "downloadChunk") {
     std::string filename;
     uint32_t chunkId;
-    std::cout << "Enter the filename: " << std::endl;
+    std::cout << "Enter the filename: ";
     std::cin >> filename;
-    std::cout << "Enter the chunk id: " << std::endl;
+    std::cout << "Enter the chunk id: ";
     std::cin >> chunkId;
     File fileInfo;
     if (peer.getFileInfo(filename, fileInfo) != 0) {

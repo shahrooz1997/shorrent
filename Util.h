@@ -12,7 +12,10 @@
 #include <cstdlib>
 #include <netinet/in.h>
 #include <string>
+#include <vector>
 #include <arpa/inet.h>
+#include <dirent.h>
+#include <sys/types.h>
 
 #define CHUNK_DEFAULT_SIZE (1024 * 1024)
 #define SERVER_IP INADDR_ANY
@@ -31,5 +34,8 @@
 
 int recvData(int sock, std::string& data);
 int sendData(int sock, const std::string& data);
+
+void listDir(const std::string& path, std::vector<std::string>& files);
+uint32_t fileSize(const std::string& path);
 
 #endif //SHORRENT__UTIL_H_

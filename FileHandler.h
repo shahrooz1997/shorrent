@@ -16,6 +16,7 @@
 class FileHandler {
  public:
   FileHandler();
+  explicit FileHandler(bool isPeer);
   int registerFiles(const std::string& address, const std::vector<File>& files);
   int fileList(std::vector<File>& files);
   int getFileInfo(const std::string& filename, File &file);
@@ -27,6 +28,7 @@ class FileHandler {
   std::mutex mtx;
   int readStateFromFile();
   int saveStateToFile();
+  int addChunkPeer(const std::string& filename, uint32_t id, uint32_t chunkSize);
 };
 
 #endif //SHORRENT__FILEHANDLER_H_
