@@ -24,12 +24,12 @@ int main(int argc, char* argv[]) {
       std::cout << "Enter the filename: " << std::endl;
       std::cin >> filename;
       if (peer.registerFile(filename) != 0) {
-        DPRINTF(true, "Error running registerFile\n");
+        std::cout << "Error running registerFile" << std::endl;
       }
     } else if (command == "fileList") {
       std::vector<File> files;
       if (peer.fileList(files) != 0) {
-        DPRINTF(true, "Error running fileList\n");
+        std::cout << "Error running fileList" << std::endl;
       }
       std::cout << "Files:" << std::endl;
       int counter = 0;
@@ -43,13 +43,38 @@ int main(int argc, char* argv[]) {
       std::cin >> filename;
       File fileInfo;
       if (peer.getFileInfo(filename, fileInfo) != 0) {
-        DPRINTF(true, "Error running getFileInfo\n");
+        std::cout << "Error running getFileInfo" << std::endl;
       }
       if (peer.downloadFile(fileInfo) != 0) {
-        DPRINTF(true, "Error running downloadFile\n");
+        std::cout << "Error running downloadFile" << std::endl;
+      }
+    } else if (command == "downloadChunk") {
+    std::string filename;
+    uint32_t chunkId;
+    std::cout << "Enter the filename: " << std::endl;
+    std::cin >> filename;
+    std::cout << "Enter the chunk id: " << std::endl;
+    std::cin >> chunkId;
+    File fileInfo;
+    if (peer.getFileInfo(filename, fileInfo) != 0) {
+      std::cout << "Error running getFileInfo" << std::endl;
+    }
+    Chunk* chunk_p = nullptr;
+    for (auto& ch: fileInfo.chunks) {
+      if (ch.id == chunkId) {
+        chunk_p = &ch;
+        break;
+      }
+    }
+    if (chunk_p != nullptr) {
+      if (peer.downloadChunk(chunk_p->peers[0], fileInfo.filename, chunkId) != 0) {
+        std::cout << "Error running downloadFile" << std::endl;
       }
     } else {
-      DPRINTF(true, "Wrong command\n");
+      std::cout << "Invalid chunk id" << std::endl;
+    }
+  } else {
+      std::cout << "Wrong command" << std::endl;
     }
   }
   return 0;

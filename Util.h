@@ -20,6 +20,7 @@
 #define BACKLOG_SIZE 1024
 #define FILES_PATH "files/"
 #define CHUNKS_PATH "chunks/"
+#define MAX_NUM_OF_THREADS 8
 
 #define DPRINTF(flag, fmt, ...) \
     do{ \

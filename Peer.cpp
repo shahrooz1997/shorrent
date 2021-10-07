@@ -6,6 +6,7 @@
 #include "gbuffer.pb.h"
 #include <thread>
 #include <future>
+#include <chrono>
 
 FileHandler Peer::fh;
 
@@ -200,6 +201,21 @@ int Peer::downloadFile(File &file) {
     // Todo: Pick the right peer to download the chunk from.
     threads.emplace_back(std::async(std::launch::async, &Peer::downloadChunk, this, chunk.peers[0],
                                     chunk.filename, chunk.id));
+    if (threads.size() >= MAX_NUM_OF_THREADS) {
+      bool block = true;
+      while(block) {
+        for (size_t i = 0; i < threads.size(); i++) {
+          if (threads[i].wait_for(std::chrono::milliseconds(1)) == std::future_status::ready) {
+            if (threads[i].get() != 0) {
+              DPRINTF(true, "Chunk download error");
+            }
+            threads.erase(threads.begin() + i);
+            i--;
+            block = false;
+          }
+        }
+      }
+    }
   }
   for (auto& t: threads) {
     if (t.get() != 0) {
