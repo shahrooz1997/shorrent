@@ -24,6 +24,7 @@
 #define FILES_PATH "files/"
 #define CHUNKS_PATH "chunks/"
 #define MAX_NUM_OF_THREADS 8
+#define PROGRESS_BAR_WIDTH 70
 
 #define DPRINTF(flag, fmt, ...) \
     do{ \

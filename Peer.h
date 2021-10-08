@@ -23,7 +23,7 @@ class Peer {
   int registerFile(const std::string& filename);
   int fileList(std::vector<File>& files);
   int downloadFile(File& file);
-  int downloadChunk(const std::string address, const std::string filename, uint32_t id);
+  int downloadChunk(const std::vector<std::string> peers, const std::string filename, uint32_t id);
   int getFileInfo(const std::string &filename, File &fileInfo);
 
  private:

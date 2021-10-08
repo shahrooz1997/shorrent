@@ -190,13 +190,19 @@ int Peer::fileList(std::vector<File>& files) {
   return 0;
 }
 
-int Peer::downloadChunk(const std::string address, const std::string filename, uint32_t id) {
+int Peer::downloadChunk(const std::vector<std::string> peers, const std::string filename, uint32_t id) {
   // Check if the peer has already the chunk.
   if (fileExist(std::string(CHUNKS_PATH) + filename + "!!!" + std::to_string(id))) {
     return 0;
   }
 
-  int ret = this->getChunk(address, filename, id);
+  int ret = -1;
+  for (auto& peer: peers) {
+    ret = this->getChunk(peer, filename, id);
+    if (ret == 0) {
+      break;
+    }
+  }
   if (ret != 0) {
     return ret;
   }
@@ -205,13 +211,17 @@ int Peer::downloadChunk(const std::string address, const std::string filename, u
 }
 
 void showProgressBar(float progress) {
-  int barWidth = 70;
+  int barWidth = PROGRESS_BAR_WIDTH;
   std::cout << "[";
   int pos = static_cast<int>(static_cast<float>(barWidth) * progress);
-  for (int i = 0; i < barWidth; ++i) {
-    if (i < pos) std::cout << "=";
-    else if (i == pos) std::cout << ">";
-    else std::cout << " ";
+  for (int i = 0; i < barWidth; i++) {
+    if (i < pos) {
+      std::cout << "=";
+    } else if (i == pos) {
+       std::cout << ">";
+    } else {
+      std::cout << " ";
+    }
   }
   std::cout << "] " << int(progress * 100.0) << " %\r";
   std::cout.flush();
@@ -221,8 +231,9 @@ int Peer::downloadFile(File &file) {
   // Download chunks.
   std::vector<std::future<int>> threads;
   int numDownloadedChunks = 0;
+  bool missingChunk = false;
   for (auto& chunk: file.chunks) {
-    threads.emplace_back(std::async(std::launch::async, &Peer::downloadChunk, this, chunk.peers[0],
+    threads.emplace_back(std::async(std::launch::async, &Peer::downloadChunk, this, chunk.peers,
                                     chunk.filename, chunk.id));
     if (threads.size() >= MAX_NUM_OF_THREADS) {
       bool block = true;
@@ -231,6 +242,7 @@ int Peer::downloadFile(File &file) {
           if (threads[i].wait_for(std::chrono::milliseconds(1)) == std::future_status::ready) {
             if (threads[i].get() != 0) {
               DPRINTF(true, "Chunk download error");
+              missingChunk = true;
             }
             threads.erase(threads.begin() + i);
             i--;
@@ -245,11 +257,17 @@ int Peer::downloadFile(File &file) {
   for (auto& t: threads) {
     if (t.get() != 0) {
       DPRINTF(true, "Chunk download error");
+      missingChunk = true;
     }
     numDownloadedChunks++;
     showProgressBar(static_cast<float>(numDownloadedChunks) / static_cast<float>(file.chunks.size()));
   }
   std::cout << std::endl;
+
+  if (missingChunk) {
+    DPRINTF(true, "Cannot combine the chunks to create the file because at least one chunk is missing.\n");
+    return -1;
+  }
 
   // Combine chunks together.
   std::ofstream outFile(std::string(FILES_PATH) + file.filename);
