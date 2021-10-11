@@ -6,6 +6,15 @@
 #include <iostream>
 #include <chrono>
 
+void init() {
+  if (!isDir(FILES_PATH)) {
+    system("mkdir " FILES_PATH);
+  }
+  if (!isDir(CHUNKS_PATH)) {
+    system("mkdir " CHUNKS_PATH);
+  }
+}
+
 int main(int argc, char *argv[]) {
   if (argc < 2) {
     std::cout << "Usage: " << argv[0] << " [IP:Port]" << std::endl;
@@ -14,6 +23,7 @@ int main(int argc, char *argv[]) {
 //  std::string address(argv[1]); // IP:Port
 //  std::string address("127.0.0.1:8081"); // IP:Port
   Peer peer(argv[1]);
+  init();
   // Start the peer server.
   std::thread(&Peer::start, peer).detach();
   std::this_thread::sleep_for(std::chrono::milliseconds(2000));
