@@ -41,5 +41,7 @@ void listDir(const std::string& path, std::vector<std::string>& files);
 void listDir2(const std::string& path, std::vector<std::string>& files);
 uint32_t fileSize(const std::string& path);
 bool fileExist(const std::string& path);
+bool isDir(const std::string &path);
+int copyDir(const std::string &src, const std::string &dest);
 
 #endif //SHORRENT__UTIL_H_
