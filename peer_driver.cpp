@@ -23,12 +23,19 @@ int main(int argc, char *argv[]) {
     std::cin >> command;
     if (command == "regFile") {
       std::string filename("sample");
-      std::cout << "Enter the filename or a directory to share all of its files: ";
+      std::cout << "Enter the filename: ";
       std::cin >> filename;
-      if (isDir(filename)) {
+      if (peer.registerFile(filename) != 0) {
+        std::cout << "Error running registerFile" << std::endl;
+      }
+    } else if (command == "regFiles") {
+      std::string firstInput;
+      std::cout << "Enter the filenames (END to end) or a directory to share all of its files: ";
+      std::cin >> firstInput;
+      if (isDir(firstInput)) {
         std::vector<std::string> files;
-        listDir2(filename, files);
-        if (copyDir(filename, FILES_PATH) == 0) {
+        listDir2(firstInput, files);
+        if (copyDir(firstInput, FILES_PATH) == 0) {
           for (auto& f: files) {
             if (peer.registerFile(f) != 0) {
               std::cout << "Error running registerFile " << f << std::endl;
@@ -38,8 +45,11 @@ int main(int argc, char *argv[]) {
           std::cout << "Error copying files to the shared directory" << std::endl;
         }
       } else {
-        if (peer.registerFile(filename) != 0) {
-          std::cout << "Error running registerFile" << std::endl;
+        while (firstInput != "END") {
+          if (peer.registerFile(firstInput) != 0) {
+            std::cout << "Error running registerFile" << std::endl;
+          }
+          std::cin >> firstInput;
         }
       }
     } else if (command == "fileList") {
