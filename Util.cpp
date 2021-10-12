@@ -155,3 +155,16 @@ int copyDir(const std::string &src, const std::string &dest) {
   system(command.c_str());
   return 0;
 }
+
+int copyFile(const std::string &src, const std::string &dest) {
+  if (!isDir(dest)) {
+    DPRINTF(true, "dest \"%s\" is not a directory.\n", dest.c_str());
+    return -1;
+  }
+  std::string command = "cp ";
+  command += src;
+  command += " ";
+  command += dest;
+  system(command.c_str());
+  return 0;
+}

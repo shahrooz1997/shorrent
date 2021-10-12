@@ -155,5 +155,6 @@ void Server::message_handle(int sock) {
       DPRINTF(true, "Operation not found: %d\n", operation.op());
     }
   }
+  close(sock);
 }
 

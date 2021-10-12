@@ -5,6 +5,7 @@
 #include "Peer.h"
 #include <iostream>
 #include <chrono>
+#include <algorithm>
 
 void init() {
   if (!isDir(FILES_PATH)) {
@@ -31,14 +32,16 @@ int main(int argc, char *argv[]) {
     std::cout << "Enter your command: ";
     std::string command("fileList");
     std::cin >> command;
-    if (command == "regFile") {
+    std::transform(command.begin(), command.end(), command.begin(),
+                   [](unsigned char c){ return std::tolower(c); });
+    if (command == "regfile") {
       std::string filename("sample");
       std::cout << "Enter the filename: ";
       std::cin >> filename;
       if (peer.registerFile(filename) != 0) {
         std::cout << "Error running registerFile" << std::endl;
       }
-    } else if (command == "regFiles") {
+    } else if (command == "regfiles") {
       std::string firstInput;
       std::cout << "Enter the filenames (END to end) or a directory to share all of its files: ";
       std::cin >> firstInput;
@@ -62,7 +65,7 @@ int main(int argc, char *argv[]) {
           std::cin >> firstInput;
         }
       }
-    } else if (command == "fileList") {
+    } else if (command == "filelist") {
       std::vector<File> files;
       if (peer.fileList(files) != 0) {
         std::cout << "Error running fileList" << std::endl;
@@ -90,7 +93,7 @@ int main(int argc, char *argv[]) {
       if (peer.downloadFile(fileInfo) != 0) {
         std::cout << "Error running downloadFile" << std::endl;
       }
-    } else if (command == "downloadChunk") {
+    } else if (command == "downloadchunk") {
       std::string filename;
       uint32_t chunkId;
       std::cout << "Enter the filename: ";
