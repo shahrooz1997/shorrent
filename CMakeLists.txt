@@ -2,11 +2,18 @@ cmake_minimum_required(VERSION 3.17)
 project(shorrent)
 
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Werror -Wconversion")
 
-add_executable(Peer peer_driver.cpp FileHandler.cpp FileHandler.h File.cpp File.h Chunk.cpp Chunk.h Util.cpp Util.h Server.cpp Server.h gbuffer.pb.cc gbuffer.pb.h Peer.cpp Peer.h)
-add_executable(Server server_driver.cpp FileHandler.cpp FileHandler.h File.cpp File.h Chunk.cpp Chunk.h Util.cpp Util.h Server.cpp Server.h gbuffer.pb.cc gbuffer.pb.h Peer.cpp Peer.h)
+add_custom_command(OUTPUT gbuffer.pb.cc gbuffer.pb.h
+        COMMAND protoc ARGS --proto_path=${CMAKE_SOURCE_DIR} --cpp_out=${CMAKE_BINARY_DIR} gbuffer.proto
+        DEPENDS gbuffer.proto)
 
+add_executable(Peer peer_driver.cpp FileHandler.cpp File.cpp Chunk.cpp Util.cpp Server.cpp Peer.cpp
+        ${CMAKE_BINARY_DIR}/gbuffer.pb.cc)
 
-TARGET_LINK_LIBRARIES(Peer pthread protobuf)
-TARGET_LINK_LIBRARIES(Server pthread protobuf)
+add_executable(Server server_driver.cpp FileHandler.cpp File.cpp Chunk.cpp Util.cpp Server.cpp Peer.cpp
+        ${CMAKE_BINARY_DIR}/gbuffer.pb.cc)
+
+target_link_libraries(Peer pthread protobuf)
+target_link_libraries(Server pthread protobuf)
