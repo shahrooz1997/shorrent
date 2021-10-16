@@ -12,7 +12,7 @@ protobuf-compiler
 ```
 To install them on Ubuntu, you may run the following command:
 ```sh
-sudo apt install -y protobuf-compiler cmake
+sudo apt install -y build-essential cmake libprotobuf-dev protobuf-compiler
 ```
 
 ### Installation

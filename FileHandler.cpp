@@ -4,6 +4,7 @@
 
 #include "FileHandler.h"
 #include "gbuffer.pb.h"
+#include <algorithm>
 
 FileHandler::FileHandler() {
   this->readStateFromFile();
