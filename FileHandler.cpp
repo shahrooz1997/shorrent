@@ -100,49 +100,20 @@ int FileHandler::getChunk(const std::string &filename, uint32_t id, std::string 
 }
 
 int FileHandler::readStateFromFile() {
-  shorrent::FileList fileList;
+  std::unique_ptr<std::vector<File>> files_p;
   std::ifstream in("state.bin");
   if (!in.is_open()) {
     return -1;
   }
-  fileList.ParseFromIstream(&in);
+  DataSerialization::deserializeFileList(&in, files_p);
   in.close();
-
-  for (int i = 0; i < fileList.files_size(); i++) {
-    this->files.emplace_back(fileList.files(i).filename(), fileList.files(i).size());
-    for (int j = 0; j < fileList.files(i).chunks_size(); j++) {
-      this->files.back().chunks.emplace_back(fileList.files(i).chunks(j).id(), fileList.files(i).chunks(j).filename(),
-                                             fileList.files(i).chunks(j).path(), fileList.files(i).chunks(j).size(),
-                                             static_cast<ChunkState>(fileList.files(i).chunks(j).state()));
-      for (int k = 0; k < fileList.files(i).chunks(j).peers_size(); k++) {
-        this->files.back().chunks.back().peers.push_back(fileList.files(i).chunks(j).peers(k));
-      }
-    }
-  }
+  this->files = std::move(*files_p);
   return 0;
 }
 
 int FileHandler::saveStateToFile() {
-  shorrent::FileList fileList;
-  for (auto& f: this->files) {
-    shorrent::File* file_p = fileList.add_files();
-    file_p->set_filename(f.filename);
-    file_p->set_size(f.size);
-    for (auto& ch: f.chunks) {
-      shorrent::Chunk* chunk_p = file_p->add_chunks();
-      chunk_p->set_id(ch.id);
-      chunk_p->set_filename(ch.filename);
-      chunk_p->set_path(ch.path);
-      chunk_p->set_size(ch.size);
-      chunk_p->set_state(static_cast<shorrent::Chunk_ChunkState>(ch.size));
-
-      for(auto& p: ch.peers) {
-        chunk_p->add_peers(p);
-      }
-    }
-  }
   std::ofstream out("state.bin");
-  fileList.SerializeToOstream(&out);
+  DataSerialization::serializeToFileList(&out, this->files);
   out.close();
   return 0;
 }
@@ -158,7 +129,3 @@ int FileHandler::addChunkPeer(const std::string &filename, uint32_t id, uint32_t
   this->files.back().chunks.emplace_back(id, filename, "", chunkSize, ChunkState::done);
   return 0;
 }
-
-
-
-

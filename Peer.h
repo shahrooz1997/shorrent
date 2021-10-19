@@ -29,8 +29,8 @@ class Peer {
  private:
   int registerChunk(const std::string& filename, uint32_t id);
   int getChunk(const std::string& address, const std::string& filename, uint32_t id);
-  int connectToServer();
-  int connectTo(const std::string& address);
+  static int connectToServer();
+  static int connectTo(const std::string& address);
 };
 
 #endif //SHORRENT__PEER_H_

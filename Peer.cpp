@@ -12,7 +12,7 @@
 
 FileHandler Peer::fh(true);
 
-Peer::Peer(const std::string &address) : address(address) {}
+Peer::Peer(const std::string &address) : address(address), sock(-1) {}
 
 void Peer::start() {
   struct sockaddr_in address;
@@ -142,7 +142,7 @@ int Peer::registerFile(const std::string& filename) {
   uint32_t fileSize = chunkCounter * (CHUNK_DEFAULT_SIZE) + static_cast<uint32_t>(lastReadSize);
 
   // Send regFile operation to the server
-  int sock = this->connectToServer();
+  int sock = Peer::connectToServer();
   if (sock < 0) {
     return -1;
   }
@@ -162,7 +162,7 @@ int Peer::registerFile(const std::string& filename) {
 }
 
 int Peer::fileList(std::vector<File>& files) {
-  int sock = this->connectToServer();
+  int sock = Peer::connectToServer();
   if (sock < 0) {
     return -1;
   }
@@ -274,7 +274,7 @@ int Peer::downloadFile(File &file) {
 }
 
 int Peer::getFileInfo(const std::string &filename, File &fileInfo) {
-  int sock = this->connectToServer();
+  int sock = Peer::connectToServer();
   if (sock < 0) {
     return -1;
   }
@@ -300,7 +300,7 @@ int Peer::getFileInfo(const std::string &filename, File &fileInfo) {
 }
 
 int Peer::registerChunk(const std::string &filename, uint32_t id) {
-  int sock = this->connectToServer();
+  int sock = Peer::connectToServer();
   if (sock < 0) {
     return -1;
   }
@@ -319,7 +319,7 @@ int Peer::registerChunk(const std::string &filename, uint32_t id) {
 }
 
 int Peer::getChunk(const std::string& address, const std::string &filename, uint32_t id) {
-  int sock = this->connectTo(address);
+  int sock = Peer::connectTo(address);
   if (sock < 0) {
     return -1;
   }
@@ -346,7 +346,7 @@ int Peer::connectToServer() {
   address += ":";
   address += std::to_string(SERVER_PORT);
 
-  return this->connectTo(address);
+  return Peer::connectTo(address);
 }
 
 int Peer::connectTo(const std::string &address) {

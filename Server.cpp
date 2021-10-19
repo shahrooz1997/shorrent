@@ -3,9 +3,9 @@
 //
 
 #include "Server.h"
-#include "gbuffer.pb.h"
+#include "DataSerialization.h"
 
-int Server::sock;
+int Server::sock = -1;
 FileHandler Server::fh;
 
 void Server::start() {
@@ -66,26 +66,20 @@ void Server::message_handle(int sock) {
     printf("one connection closed.\n");
     return;
   }
-  shorrent::Operation operation;
-  operation.ParseFromString(recvd);
-  switch (operation.op()) {
+  std::unique_ptr<shorrent::Operation::Type> op_p;
+  std::unique_ptr<std::string> data_p;
+  std::unique_ptr<std::string> msg_p;
+  DataSerialization::deserializeOperation(recvd, op_p, data_p, msg_p);
+  switch (*op_p) {
     case shorrent::Operation_Type::Operation_Type_regFile: {
-      shorrent::RegFile regFile;
-      regFile.ParseFromString(operation.data());
-      std::vector<File> files;
-      for (int i = 0; i < regFile.files_size(); i++) {
-        files.emplace_back(regFile.files(i).filename(), regFile.files(i).size());
-      }
-      if (Server::fh.registerFiles(regFile.address(), files) != 0) {
+      std::unique_ptr<std::string> address_p;
+      std::unique_ptr<std::vector<File>> files_p;
+      DataSerialization::deserializeRegFile(*data_p, address_p, files_p);
+      if (Server::fh.registerFiles(*address_p, *files_p) != 0) {
         DPRINTF(true, "Server::fh.registerFiles error");
       }
-
       // Send back success.
-      shorrent::Operation replyOperation;
-      replyOperation.set_op(shorrent::Operation_Type::Operation_Type_ok);
-      std::string tempStr;
-      replyOperation.SerializeToString(&tempStr);
-      sendData(sock, tempStr);
+      sendData(sock, DataSerialization::serializeToOperation(shorrent::Operation_Type::Operation_Type_ok));
       break;
     }
     case shorrent::Operation_Type::Operation_Type_fileList: {
@@ -93,58 +87,29 @@ void Server::message_handle(int sock) {
       if (Server::fh.fileList(files) != 0) {
         DPRINTF(true, "Server::fh.fileList error");
       }
-      shorrent::FileList fileList;
-      for (auto f: files) {
-        shorrent::File* file_p = fileList.add_files();
-        file_p->set_filename(f.filename);
-        file_p->set_size(f.size);
-      }
-      std::string tempStr;
-      fileList.SerializeToString(&tempStr);
-      sendData(sock, tempStr);
+      sendData(sock, DataSerialization::serializeToFileList(files));
       break;
     }
     case shorrent::Operation_Type::Operation_Type_getFileInfo: {
-      shorrent::File file;
-      file.ParseFromString(operation.data());
-      File fileInfo;
-      if (Server::fh.getFileInfo(file.filename(), fileInfo) != 0) {
+      std::unique_ptr<File> file_p;
+      DataSerialization::deserializeFile(*data_p, file_p);
+      if (Server::fh.getFileInfo(file_p->filename, *file_p) != 0) {
         DPRINTF(true, "Server::fh.getFileInfo error");
       }
-
       // Send back data.
-      shorrent::File replyFile;
-      replyFile.set_filename(fileInfo.filename);
-      replyFile.set_size(fileInfo.size);
-      for (auto ch: fileInfo.chunks) {
-        shorrent::Chunk* chunk_p = replyFile.add_chunks();
-        chunk_p->set_id(ch.id);
-        chunk_p->set_filename(ch.filename);
-        chunk_p->set_path(ch.path);
-        chunk_p->set_size(ch.size);
-        chunk_p->set_state(static_cast<shorrent::Chunk_ChunkState>(ch.state));
-        for (auto p: ch.peers) {
-          chunk_p->add_peers(p);
-        }
-      }
-      std::string tempStr;
-      replyFile.SerializeToString(&tempStr);
-      sendData(sock, tempStr);
+      sendData(sock, DataSerialization::serializeToFile(*file_p));
       break;
     }
     case shorrent::Operation_Type::Operation_Type_regChunk: {
-      shorrent::RegChunk regChunk;
-      regChunk.ParseFromString(operation.data());
-      if (Server::fh.registerChunk(regChunk.address(), regChunk.filename(), regChunk.id()) != 0) {
+      std::unique_ptr<std::string> address_p;
+      std::unique_ptr<std::string> filename_p;
+      std::unique_ptr<uint32_t> id_p;
+      DataSerialization::deserializeRegChunk(*data_p, address_p, filename_p, id_p);
+      if (Server::fh.registerChunk(*address_p, *filename_p, *id_p) != 0) {
         DPRINTF(true, "Server::fh.registerChunk");
       }
-
       // Send back success.
-      shorrent::Operation replyOperation;
-      replyOperation.set_op(shorrent::Operation_Type::Operation_Type_ok);
-      std::string tempStr;
-      replyOperation.SerializeToString(&tempStr);
-      sendData(sock, tempStr);
+      sendData(sock, DataSerialization::serializeToOperation(shorrent::Operation_Type::Operation_Type_ok));
       break;
     }
     case shorrent::Operation_Type::Operation_Type_ok: {
@@ -152,9 +117,8 @@ void Server::message_handle(int sock) {
       break;
     }
     default: {
-      DPRINTF(true, "Operation not found: %d\n", operation.op());
+      DPRINTF(true, "Operation not found: %d\n", *op_p);
     }
   }
   close(sock);
 }
-
