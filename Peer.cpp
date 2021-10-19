@@ -3,12 +3,12 @@
 //
 
 #include "Peer.h"
-#include "gbuffer.pb.h"
 #include <thread>
 #include <future>
 #include <chrono>
 #include <algorithm>
 #include <random>
+#include "DataSerialization.h"
 
 FileHandler Peer::fh(true);
 
@@ -86,19 +86,20 @@ void Peer::message_handle(int sock) {
     printf("one connection closed.\n");
     return;
   }
-  shorrent::Operation operation;
-  operation.ParseFromString(recvd);
-  switch (operation.op()) {
+  std::unique_ptr<shorrent::Operation::Type> op_p;
+  std::unique_ptr<std::string> data_p;
+  std::unique_ptr<std::string> msg_p;
+  DataSerialization::deserializeOperation(recvd, op_p, data_p, msg_p);
+  switch (*op_p) {
     case shorrent::Operation_Type::Operation_Type_getChunk: {
-      shorrent::RegChunk regChunk;
-      regChunk.ParseFromString(operation.data());
-      shorrent::Data data;
-      Peer::fh.getChunk(regChunk.filename(), regChunk.id(), *(data.mutable_data()));
+      std::unique_ptr<std::string> filename_p;
+      std::unique_ptr<uint32_t> id_p;
+      DataSerialization::deserializeRegChunk(*data_p, filename_p, id_p);
+      std::string data;
+      Peer::fh.getChunk(*filename_p, *id_p, data);
 
       // Send back data.
-      std::string tempStr;
-      data.SerializeToString(&tempStr);
-      sendData(sock, tempStr);
+      sendData(sock, DataSerialization::serializeToData(data));
       break;
     }
     case shorrent::Operation_Type::Operation_Type_ok: {
@@ -106,7 +107,7 @@ void Peer::message_handle(int sock) {
       break;
     }
     default: {
-      DPRINTF(true, "Operation not found: %d\n", operation.op());
+      DPRINTF(true, "Operation not found: %d\n", *op_p);
     }
   }
   close(sock);
@@ -145,26 +146,16 @@ int Peer::registerFile(const std::string& filename) {
   if (sock < 0) {
     return -1;
   }
-  shorrent::RegFile regFile;
-  regFile.set_address(this->address);
-  shorrent::File* file_p = regFile.add_files();
-  file_p->set_filename(filename);
-  file_p->set_size(fileSize);
-  std::string data;
-  regFile.SerializeToString(&data);
-
-  shorrent::Operation operation;
-  operation.set_op(shorrent::Operation_Type::Operation_Type_regFile);
-  operation.set_data(data);
-
-  std::string tempStr;
-  operation.SerializeToString(&tempStr);
-  sendData(sock, tempStr);
-  recvData(sock, tempStr);
+  std::string operationData = DataSerialization::serializeToRegFile(this->address,
+                                    std::vector<File>(1, File(filename, fileSize)));
+  sendData(sock, DataSerialization::serializeToOperation(shorrent::Operation_Type::Operation_Type_regFile,
+                                                         operationData, ""));
+  std::string recvd;
+  recvData(sock, recvd);
   close(sock);
-  shorrent::Operation operation2;
-  operation2.ParseFromString(tempStr);
-  if (operation2.op() != shorrent::Operation_Type::Operation_Type_ok) {
+  std::unique_ptr<shorrent::Operation::Type> op_p;
+  DataSerialization::deserializeOperation(recvd, op_p);
+  if (*op_p != shorrent::Operation_Type::Operation_Type_ok) {
     return -1;
   }
   return 0;
@@ -175,18 +166,13 @@ int Peer::fileList(std::vector<File>& files) {
   if (sock < 0) {
     return -1;
   }
-  shorrent::Operation operation;
-  operation.set_op(shorrent::Operation_Type::Operation_Type_fileList);
-  std::string tempStr;
-  operation.SerializeToString(&tempStr);
-  sendData(sock, tempStr);
-  recvData(sock, tempStr);
+  sendData(sock, DataSerialization::serializeToOperation(shorrent::Operation_Type::Operation_Type_fileList));
+  std::string recvd;
+  recvData(sock, recvd);
   close(sock);
-  shorrent::FileList fileList;
-  fileList.ParseFromString(tempStr);
-  for (int i = 0; i < fileList.files_size(); i++) {
-    files.emplace_back(fileList.files(i).filename(), fileList.files(i).size());
-  }
+  std::unique_ptr<std::vector<File>> files_p;
+  DataSerialization::deserializeFileList(recvd, files_p);
+  files = std::move(*files_p);
   return 0;
 }
 
@@ -292,30 +278,15 @@ int Peer::getFileInfo(const std::string &filename, File &fileInfo) {
   if (sock < 0) {
     return -1;
   }
-  shorrent::File file;
-  file.set_filename(filename);
-  std::string dataTmp;
-  file.SerializeToString(&dataTmp);
-
-  shorrent::Operation operation;
-  operation.set_op(shorrent::Operation_Type::Operation_Type_getFileInfo);
-  operation.set_data(dataTmp);
-  std::string tempStr;
-  operation.SerializeToString(&tempStr);
-  sendData(sock, tempStr);
-  recvData(sock, tempStr);
+  std::string operationData = DataSerialization::serializeToFile(File(filename));
+  sendData(sock, DataSerialization::serializeToOperation(shorrent::Operation_Type::Operation_Type_getFileInfo,
+                                                           operationData, ""));
+  std::string recvd;
+  recvData(sock, recvd);
   close(sock);
-  shorrent::File replyFile;
-  replyFile.ParseFromString(tempStr);
-  fileInfo.filename = replyFile.filename();
-  fileInfo.size = replyFile.size();
-  for (int i = 0; i < replyFile.chunks_size(); i++) {
-    fileInfo.chunks.emplace_back(replyFile.chunks(i).id(), replyFile.chunks(i).filename(), replyFile.chunks(i).path(),
-                                 replyFile.chunks(i).size(), static_cast<ChunkState>(replyFile.chunks(i).state()));
-    for (int j = 0; j < replyFile.chunks(i).peers_size(); j++) {
-      fileInfo.chunks.back().add_peer(replyFile.chunks(i).peers(j));
-    }
-  }
+  std::unique_ptr<File> file_p;
+  DataSerialization::deserializeFile(recvd, file_p);
+  fileInfo = std::move(*file_p);
   // Put the rarest chunks to the top.
   std::sort(fileInfo.chunks.begin(), fileInfo.chunks.end(),
             [](Chunk& ch1, Chunk& ch2){ return ch1.peers.size() < ch2.peers.size(); });
@@ -333,24 +304,15 @@ int Peer::registerChunk(const std::string &filename, uint32_t id) {
   if (sock < 0) {
     return -1;
   }
-  shorrent::RegChunk regChunk;
-  regChunk.set_filename(filename);
-  regChunk.set_id(id);
-  regChunk.set_address(this->address);
-  std::string dataTmp;
-  regChunk.SerializeToString(&dataTmp);
-
-  shorrent::Operation operation;
-  operation.set_op(shorrent::Operation_Type::Operation_Type_regChunk);
-  operation.set_data(dataTmp);
-  std::string tempStr;
-  operation.SerializeToString(&tempStr);
-  sendData(sock, tempStr);
-  recvData(sock, tempStr);
+  std::string operationData = DataSerialization::serializeToRegChunk(this->address, filename, id);
+  sendData(sock, DataSerialization::serializeToOperation(shorrent::Operation_Type::Operation_Type_regChunk,
+                                                         operationData, ""));
+  std::string recvd;
+  recvData(sock, recvd);
   close(sock);
-  shorrent::Operation operation2;
-  operation2.ParseFromString(tempStr);
-  if (operation2.op() != shorrent::Operation_Type::Operation_Type_ok) {
+  std::unique_ptr<shorrent::Operation::Type> op_p;
+  DataSerialization::deserializeOperation(recvd, op_p);
+  if (*op_p != shorrent::Operation_Type::Operation_Type_ok) {
     return -1;
   }
   return 0;
@@ -361,26 +323,17 @@ int Peer::getChunk(const std::string& address, const std::string &filename, uint
   if (sock < 0) {
     return -1;
   }
-  shorrent::RegChunk regChunk;
-  regChunk.set_filename(filename);
-  regChunk.set_id(id);
-  std::string dataTmp;
-  regChunk.SerializeToString(&dataTmp);
-
-  shorrent::Operation operation;
-  operation.set_op(shorrent::Operation_Type::Operation_Type_getChunk);
-  operation.set_data(dataTmp);
-  std::string tempStr;
-  operation.SerializeToString(&tempStr);
-  sendData(sock, tempStr);
-  recvData(sock, tempStr);
+  std::string operationData = DataSerialization::serializeToRegChunk(filename, id);
+  sendData(sock, DataSerialization::serializeToOperation(shorrent::Operation_Type::Operation_Type_getChunk,
+                                                         operationData, ""));
+  std::string recvd;
+  recvData(sock, recvd);
   close(sock);
-  shorrent::Data data;
-  data.ParseFromString(tempStr);
-
+  std::unique_ptr<std::string> data_p;
+  DataSerialization::deserializeData(recvd, data_p);
   std::string chunkFilename = filename + "!!!" + std::to_string(id);
   std::ofstream outFile(std::string(CHUNKS_PATH) + chunkFilename);
-  outFile.write(data.data().c_str(), static_cast<std::streamsize>(data.data().size()));
+  outFile.write(data_p->c_str(), static_cast<std::streamsize>(data_p->size()));
   outFile.close();
   return 0;
 }

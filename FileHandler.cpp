@@ -3,8 +3,8 @@
 //
 
 #include "FileHandler.h"
-#include "gbuffer.pb.h"
 #include <algorithm>
+#include "DataSerialization.h"
 
 FileHandler::FileHandler() {
   this->readStateFromFile();

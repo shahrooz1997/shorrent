@@ -3,6 +3,7 @@
 //
 
 #include "Chunk.h"
+
 Chunk::Chunk(uint32_t id, const std::string& filename, const std::string& path, uint32_t size, const ChunkState state) {
   this->id = id;
   this->filename = filename;

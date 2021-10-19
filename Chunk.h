@@ -24,7 +24,7 @@ class Chunk {
 
   std::vector<std::string> peers; // string = IP:PORT
 
-  Chunk(uint32_t id, const std::string& filename, const std::string& path, uint32_t size, const ChunkState state);
+  Chunk(uint32_t id, const std::string& filename, const std::string& path, uint32_t size, ChunkState state);
   int add_peer(const std::string& address);
 };
 

@@ -15,7 +15,7 @@ class File {
   std::vector<Chunk> chunks;
 
   File() = default;
-  File(std::string filename, uint32_t size);
+  explicit File(std::string filename, uint32_t size = 0);
   File(std::string filename, uint32_t size, std::string address);
 
 };

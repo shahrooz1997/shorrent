@@ -1,5 +1,6 @@
 #!/bin/bash
 
+rm -rf Peer Server cmake-build-install
 mkdir cmake-build-install > /dev/null 2>&1
 set -e
 #protoc --cpp_out=./ gbuffer.proto
